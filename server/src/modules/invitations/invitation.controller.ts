@@ -51,7 +51,10 @@ export const invitationController = {
       const invitation = await invitationService.createInvitation(parsed.data)
       res.status(201).json(invitation)
     } catch (err: any) {
-      res.status(500).json({ error: 'Taklifnomani saqlashda xatolik yuz berdi' })
+      console.error('❌ Error creating invitation:', err)
+      res.status(500).json({
+        error: err.message || 'Taklifnomani saqlashda xatolik yuz berdi',
+      })
     }
   },
 

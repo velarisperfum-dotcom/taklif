@@ -3,13 +3,15 @@ import { useParams, Link } from 'react-router-dom'
 import { Invitation } from '../types'
 import { api } from '../services/api'
 import { TemplateRenderer } from '../templates'
-import { Heart, AlertCircle, ArrowLeft } from 'lucide-react'
+import { Heart, AlertCircle, ArrowLeft, Printer } from 'lucide-react'
+import { PrintInvitationModal } from '../components/PrintInvitationModal'
 
 export const PublicInvitationPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
   const [invitation, setInvitation] = useState<Invitation | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const [printOpen, setPrintOpen] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -71,5 +73,41 @@ export const PublicInvitationPage: React.FC = () => {
     )
   }
 
-  return <TemplateRenderer invitation={invitation} />
+  return (
+    <div className="relative">
+      {/* Floating Print / PDF button */}
+      <div className="fixed top-4 right-4 z-40 no-print flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setPrintOpen(true)}
+          className="px-3.5 py-2 rounded-full bg-stone-900/80 hover:bg-stone-900 text-amber-300 hover:text-amber-200 border border-amber-500/30 text-xs font-semibold backdrop-blur-md shadow-lg transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+          title="Qog‘ozga yoki PDF ga chop etish"
+        >
+          <Printer className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Chop etish (PDF)</span>
+        </button>
+      </div>
+
+      <TemplateRenderer invitation={invitation} />
+
+      {/* Print Modal */}
+      <PrintInvitationModal
+        isOpen={printOpen}
+        onClose={() => setPrintOpen(false)}
+        invitation={{
+          groomName: invitation.groomName,
+          brideName: invitation.brideName,
+          groomParents: invitation.groomParents,
+          brideParents: invitation.brideParents,
+          weddingDate: invitation.weddingDate,
+          weddingTime: invitation.weddingTime,
+          venueName: invitation.venueName,
+          venueAddress: invitation.venueAddress,
+          invitationMessage: invitation.invitationMessage,
+          coverTitle: invitation.coverTitle,
+          publicSlug: invitation.publicSlug,
+        }}
+      />
+    </div>
+  )
 }

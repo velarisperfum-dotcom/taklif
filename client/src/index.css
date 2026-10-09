@@ -91,3 +91,56 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a29e;
 }
+
+/* Print Styles */
+@media print {
+  @page {
+    size: A5 portrait;
+    margin: 10mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #1c1917 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide navigation, footers, buttons, and backdrop */
+  nav, footer, button, .no-print {
+    display: none !important;
+  }
+
+  /* When printing card modal is open */
+  body.printing-card {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  body.printing-card * {
+    visibility: hidden;
+  }
+
+  body.printing-card #printable-wedding-card,
+  body.printing-card #printable-wedding-card * {
+    visibility: visible;
+  }
+
+  body.printing-card #printable-wedding-card {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 999999 !important;
+    background: #ffffff !important;
+  }
+}

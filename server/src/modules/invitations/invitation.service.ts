@@ -1,5 +1,6 @@
 import { prisma } from '../../db.js'
 import { generateSlug } from './slug.js'
+import { DEFAULT_TEMPLATES } from '../templates/templates.data.js'
 
 export const invitationService = {
   async getInvitations(ownerId?: string) {
@@ -53,6 +54,27 @@ export const invitationService = {
   },
 
   async createInvitation(data: any) {
+    // 1. Ensure the referenced template exists in DB
+    const templateExists = await prisma.template.findUnique({
+      where: { id: data.templateId },
+    })
+    if (!templateExists) {
+      const fallback = DEFAULT_TEMPLATES.find((t) => t.id === data.templateId) || {
+        id: data.templateId,
+        name: 'To‘y Taklifnomasi',
+        category: 'Premium',
+        description: 'Elegand va hashamatli to‘y taklifnomasi',
+        previewImage: '/templates/palace-terrace.jpg',
+        priceTier: 'PREMIUM' as const,
+        active: true,
+      }
+      await prisma.template.upsert({
+        where: { id: fallback.id },
+        update: fallback,
+        create: fallback,
+      })
+    }
+
     let slug = generateSlug(data.groomName, data.brideName)
     let collision = await prisma.invitation.findUnique({ where: { publicSlug: slug } })
     while (collision) {

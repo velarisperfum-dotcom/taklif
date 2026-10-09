@@ -6,6 +6,8 @@ import { TemplateCard } from '../components/TemplateCard'
 import { TemplateRenderer } from '../templates'
 import { PreviewModal } from '../components/PreviewModal'
 import { ShareModal } from '../components/ShareModal'
+import { PrintInvitationModal } from '../components/PrintInvitationModal'
+import { templateService } from '../services/template.service'
 import confetti from 'canvas-confetti'
 import {
   Sparkles,
@@ -25,6 +27,7 @@ import {
   Copy,
   Plus,
   Trash2,
+  Printer,
 } from 'lucide-react'
 
 const STEP_TITLES = [
@@ -99,13 +102,14 @@ export const CreateWizardPage: React.FC = () => {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
   const [shareOpen, setShareOpen] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [printModalOpen, setPrintModalOpen] = useState(false)
 
   // Load templates and edit data if editId
   useEffect(() => {
     async function init() {
       try {
         setLoadingTemplates(true)
-        const tmpls = await api.getTemplates()
+        const tmpls = await templateService.getTemplates()
         setTemplates(tmpls)
 
         if (editId) {
@@ -775,14 +779,25 @@ export const CreateWizardPage: React.FC = () => {
                   Siz kiritgan ma’lumotlar bilan taklifnoma aynan shunday ko‘rinadi
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={handleNext}
-                className="px-6 py-2.5 rounded-full bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs transition-all flex items-center gap-2 shadow"
-              >
-                <span>Davom etish</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPrintModalOpen(true)}
+                  className="px-4 py-2.5 rounded-full border border-stone-300 hover:bg-stone-100 text-stone-800 font-semibold text-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Printer className="w-4 h-4 text-amber-700" />
+                  <span className="hidden sm:inline">Qog‘ozga chop etish</span>
+                  <span className="sm:hidden">Chop etish</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="px-6 py-2.5 rounded-full bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs transition-all flex items-center gap-2 shadow cursor-pointer"
+                >
+                  <span>Chop etishga o‘tish</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             <div className="bg-stone-900 rounded-3xl overflow-hidden shadow-2xl border border-stone-800">
@@ -807,7 +822,7 @@ export const CreateWizardPage: React.FC = () => {
                   Taklifnomani chop etishga tayyormisiz?
                 </h3>
                 <p className="text-sm text-stone-500 max-w-md mx-auto">
-                  Tugmani bosing va taklifnomangiz darhol saqlanib, yaqinlaringizga yuborish uchun unikal havola yaratiladi.
+                  Quyidagi tugmani bosing va taklifnomangiz darhol chop etilib (nashr qilinib), yaqinlaringizga yuborish uchun unikal havola yaratiladi. Shuningdek qog‘ozda chop etish ham mumkin.
                 </p>
 
                 <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-left text-xs space-y-2">
@@ -831,21 +846,30 @@ export const CreateWizardPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-4 flex flex-col sm:flex-row gap-3">
                   <button
                     type="button"
                     onClick={handlePublish}
                     disabled={saving}
-                    className="w-full py-4 px-8 rounded-full bg-stone-900 hover:bg-stone-800 text-white font-bold text-sm transition-all shadow-xl shadow-stone-900/20 active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                    className="flex-1 py-4 px-6 rounded-full bg-stone-900 hover:bg-stone-800 text-white font-bold text-sm transition-all shadow-xl shadow-stone-900/20 active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                   >
                     {saving ? (
                       <span className="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4 text-amber-400" />
-                        <span>Taklifnomani saqlash va havolani olish</span>
+                        <span>Taklifnomani chop etish (Nashr qilish)</span>
                       </>
                     )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPrintModalOpen(true)}
+                    className="py-4 px-6 rounded-full border border-stone-300 hover:bg-stone-100 text-stone-800 font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
+                  >
+                    <Printer className="w-4 h-4 text-amber-700" />
+                    <span>Qog‘ozga chop etish (PDF)</span>
                   </button>
                 </div>
               </>
@@ -856,10 +880,10 @@ export const CreateWizardPage: React.FC = () => {
                 </div>
 
                 <h3 className="text-3xl font-serif-cormorant font-bold text-stone-900">
-                  Tabriklaymiz! Taklifnomangiz tayyor!
+                  Tabriklaymiz! Taklifnomangiz muvaffaqiyatli chop etildi!
                 </h3>
                 <p className="text-sm text-stone-500 max-w-md mx-auto">
-                  Sizning unikal taklifnoma havolangiz muvaffaqiyatli yaratildi. Endi uni yaqinlaringizga yuborishingiz mumkin.
+                  Sizning unikal taklifnoma havolangiz yaratildi. Uni yaqinlaringizga yuborishingiz yoki A5 formatda qog‘ozga chop etishingiz mumkin.
                 </p>
 
                 {/* Public Link Box */}
@@ -881,12 +905,12 @@ export const CreateWizardPage: React.FC = () => {
                 </div>
 
                 {/* Primary Action Buttons */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                   <a
                     href={`/t/${savedSlug}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="py-3 px-6 rounded-full bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all shadow"
+                    className="py-3 px-4 rounded-full bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all shadow"
                   >
                     <ExternalLink className="w-4 h-4" />
                     <span>Taklifnomani ochish</span>
@@ -894,8 +918,17 @@ export const CreateWizardPage: React.FC = () => {
 
                   <button
                     type="button"
+                    onClick={() => setPrintModalOpen(true)}
+                    className="py-3 px-4 rounded-full bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow cursor-pointer"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>Qog‘ozga chop etish</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => setShareOpen(true)}
-                    className="py-3 px-6 rounded-full bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow cursor-pointer"
+                    className="py-3 px-4 rounded-full bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow cursor-pointer"
                   >
                     <Send className="w-4 h-4" />
                     <span>Yaqinlarga ulashish</span>
@@ -966,6 +999,26 @@ export const CreateWizardPage: React.FC = () => {
           title={`${formData.groomName} & ${formData.brideName}`}
         />
       )}
+
+      {/* Print Invitation Modal */}
+      <PrintInvitationModal
+        isOpen={printModalOpen}
+        onClose={() => setPrintModalOpen(false)}
+        invitation={{
+          groomName: formData.groomName.trim() || 'Kuyov Ismi',
+          brideName: formData.brideName.trim() || 'Kelin Ismi',
+          groomParents: formData.groomParents,
+          brideParents: formData.brideParents,
+          weddingDate: formData.weddingDate,
+          weddingTime: formData.weddingTime,
+          venueName: formData.venueName.trim() || 'To‘yxona Nomi',
+          venueAddress: formData.venueAddress.trim() || 'To‘yxona Manzili',
+          invitationMessage: formData.invitationMessage,
+          coverTitle: formData.coverTitle,
+          publicSlug: savedSlug || undefined,
+        }}
+      />
     </div>
   )
 }
+

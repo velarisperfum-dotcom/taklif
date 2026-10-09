@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Invitation, RSVP } from '../types'
 import { api } from '../services/api'
 import { ShareModal } from '../components/ShareModal'
+import { PrintInvitationModal } from '../components/PrintInvitationModal'
 import {
   Sparkles,
   Plus,
@@ -18,6 +19,7 @@ import {
   X,
   FileCheck2,
   CopyPlus,
+  Printer,
 } from 'lucide-react'
 import { formatShortUzbekDate } from '../utils/date'
 
@@ -30,6 +32,7 @@ export const DashboardPage: React.FC = () => {
   const [loadingRsvps, setLoadingRsvps] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [shareData, setShareData] = useState<{ url: string; title: string } | null>(null)
+  const [printingInvitation, setPrintingInvitation] = useState<Invitation | null>(null)
 
   const loadInvitations = async () => {
     try {
@@ -248,6 +251,15 @@ export const DashboardPage: React.FC = () => {
 
                     <button
                       type="button"
+                      onClick={() => setPrintingInvitation(inv)}
+                      className="p-2 rounded-xl text-amber-700 hover:text-amber-900 hover:bg-amber-100/60 transition-colors cursor-pointer"
+                      title="Qog‘ozga chop etish (PDF)"
+                    >
+                      <Printer className="w-4 h-4" />
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() =>
                         setShareData({
                           url: fullUrl,
@@ -416,6 +428,15 @@ export const DashboardPage: React.FC = () => {
             onClose={() => setShareData(null)}
             url={shareData.url}
             title={shareData.title}
+          />
+        )}
+
+        {/* Print Modal */}
+        {printingInvitation && (
+          <PrintInvitationModal
+            isOpen={true}
+            onClose={() => setPrintingInvitation(null)}
+            invitation={printingInvitation}
           />
         )}
       </div>
