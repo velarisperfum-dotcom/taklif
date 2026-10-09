@@ -1,6 +1,6 @@
 import { Invitation, Template, RSVP, CreateInvitationInput } from '../types'
 
-const API_BASE = '/api'
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE}${endpoint}`
