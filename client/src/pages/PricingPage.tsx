@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CheckCircle2, Sparkles } from 'lucide-react'
+import { CheckCircle2, Sparkles, Gift } from 'lucide-react'
+import { RequestFreeVipModal } from '../components/RequestFreeVipModal'
 
 export const PricingPage: React.FC = () => {
+  const [freeVipOpen, setFreeVipOpen] = useState(false)
+
   return (
     <div className="min-h-screen bg-stone-50 py-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -124,16 +127,31 @@ export const PricingPage: React.FC = () => {
               </ul>
             </div>
 
-            <div className="pt-8">
+            <div className="pt-8 space-y-3">
               <Link
                 to="/create"
                 className="w-full py-3.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-xs flex items-center justify-center transition-all shadow-lg shadow-amber-500/20"
               >
                 Premium taklifnoma yaratish (1,000 so‘m)
               </Link>
+
+              <button
+                type="button"
+                onClick={() => setFreeVipOpen(true)}
+                className="w-full py-3 rounded-full border border-amber-500/40 hover:bg-amber-500/10 text-amber-300 font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <Gift className="w-4 h-4 text-amber-400" />
+                <span>🎁 Admindan bepul VIP so‘rash</span>
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Free VIP Modal */}
+        <RequestFreeVipModal
+          isOpen={freeVipOpen}
+          onClose={() => setFreeVipOpen(false)}
+        />
       </div>
     </div>
   )

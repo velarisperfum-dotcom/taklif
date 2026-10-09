@@ -275,4 +275,27 @@ export const api = {
       return []
     }
   },
+
+  // Free VIP request
+  async requestFreeVip(data: {
+    name: string
+    contact: string
+    telegramId?: number | string
+    source?: string
+    slug?: string
+  }): Promise<{ success: boolean; message: string; requestId?: string }> {
+    return request<{ success: boolean; message: string; requestId?: string }>('/vip/request-free', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  async checkVipStatus(identifier: string): Promise<boolean> {
+    try {
+      const res = await request<{ isApproved: boolean }>(`/vip/status/${encodeURIComponent(identifier)}`)
+      return res.isApproved
+    } catch {
+      return false
+    }
+  },
 }

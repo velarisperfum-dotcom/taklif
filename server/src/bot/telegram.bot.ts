@@ -2,6 +2,7 @@ import { Telegraf, Markup } from 'telegraf'
 import { config } from '../config/env.js'
 import { prisma } from '../db.js'
 import { generateSlug } from '../modules/invitations/slug.js'
+import { freeVipService, FreeVipRequest } from '../modules/vip/freeVip.service.js'
 
 export const bot = new Telegraf(config.telegramBotToken)
 
@@ -30,6 +31,40 @@ const POPULAR_TEMPLATES = [
   { id: 'rose-garden', name: '🌸 Rose Garden (Pushti Bog‘)' },
   { id: 'black-tie', name: '🖤 Black Tie (Qora & Oltin)' },
 ]
+
+/**
+ * Send Free VIP request to Admin with [✅ Ha] and [❌ Yo‘q] buttons
+ */
+export async function notifyAdminFreeVipRequest(req: FreeVipRequest): Promise<boolean> {
+  if (!config.telegramBotToken || !config.adminChatId) return false
+  try {
+    const adminText = `🔔 *YANGI BEPUL PREMIUM VIP SO‘ROVI!*
+
+👤 *Mijoz:* ${req.name}
+📱 *Bog‘lanish / Telefon:* \`${req.contact}\`
+🆔 *Telegram ID:* \`${req.telegramId || 'Saytdan kiritilgan'}\`
+🌐 *Manba:* ${req.source === 'telegram_bot' ? 'Telegram Bot' : req.source === 'mini_app' ? 'Mini App' : 'Veb-sayt'}
+${req.slug ? `💍 *Tanlangan taklifnoma:* ${config.frontendUrl}/t/${req.slug}` : ''}
+⏰ *Yuborilgan vaqt:* ${new Date(req.createdAt).toLocaleString('uz-UZ')}
+
+❓ *Mijoz so‘rovi:*
+_"Hurmatli Admin, menga Premium VIP tarifini tekinga (bepul) berasizmi?"_`
+
+    await bot.telegram.sendMessage(config.adminChatId, adminText, {
+      parse_mode: 'Markdown',
+      ...Markup.inlineKeyboard([
+        [
+          Markup.button.callback('✅ Ha (Tekinga berish)', `freevip_yes_${req.id}`),
+          Markup.button.callback('❌ Yo‘q (Rad etish)', `freevip_no_${req.id}`),
+        ],
+      ]),
+    })
+    return true
+  } catch (err) {
+    console.error('Failed to notify admin of free VIP request:', err)
+    return false
+  }
+}
 
 export function setupTelegramBot() {
   if (!config.telegramBotToken) {
@@ -72,6 +107,7 @@ Quyidagi tugmani bosing va Mini Appni oching:`
           Markup.button.webApp('🎨 Shablonlar', `${config.frontendUrl}/templates`),
           Markup.button.webApp('✍️ Yaratish', `${config.frontendUrl}/create`),
         ],
+        [Markup.button.callback('🎁 Bepul VIP So‘rash (Admindan)', 'request_free_vip_bot')],
         [Markup.button.webApp('👑 Premium VIP (1,000 so‘m)', `${config.frontendUrl}/pricing`)],
       ])
     )
@@ -82,9 +118,244 @@ Quyidagi tugmani bosing va Mini Appni oching:`
       Markup.keyboard([
         [Markup.button.webApp('🚀 Mini Appni Ochish', config.frontendUrl)],
         [Markup.button.webApp('🎨 Barcha Shablonlar', `${config.frontendUrl}/templates`), Markup.button.webApp('✍️ Taklifnoma Yaratish', `${config.frontendUrl}/create`)],
-        ['👑 Premium Obuna (1,000 so‘m)', '📞 Aloqa'],
+        ['👑 Premium Obuna (1,000 so‘m)', '🎁 Bepul VIP So‘rash'],
+        ['📞 Aloqa'],
       ]).resize()
     )
+  })
+
+  // /admin command (Admin Control Panel)
+  bot.command('admin', async (ctx) => {
+    if (String(ctx.from.id) !== String(config.adminChatId)) {
+      await ctx.reply('⛔️ Kechirasiz, siz ushbu botning bosh administratori emassiz.')
+      return
+    }
+
+    const stats = await freeVipService.getStats()
+    const adminText = `🛡 *TAKLIFNOMA — ADMIN BOSHQARUV PANELI*
+
+📊 *Umumiy statistika:*
+• 💌 Jami taklifnomalar: *${stats.totalInvitations} ta*
+• 🎁 Jami bepul VIP so‘rovlar: *${stats.totalFreeRequests} ta*
+• ⏳ Kutilayotgan so‘rovlar: *${stats.pendingRequests} ta*
+• ✅ Tasdiqlangan (VIP berilgan): *${stats.approvedRequests} ta*
+• ❌ Rad etilgan so‘rovlar: *${stats.rejectedRequests} ta*
+
+⚙️ *Tarif va to‘lov sozlamalari:*
+• 💳 Karta: \`${config.cardNumber}\` (${config.cardHolder})
+• 💰 Narx: *${config.premiumPrice.toLocaleString('uz-UZ')} so‘m*
+• 📞 Aloqa raqami: *+998 93 718 88 85*
+• 🌐 Sayt: ${config.frontendUrl}
+
+Quyidagi tugmalar orqali so‘rovlarni ko‘rishingiz mumkin:`
+
+    await ctx.replyWithMarkdown(
+      adminText,
+      Markup.inlineKeyboard([
+        [Markup.button.callback('🔄 Statistikani Yangilash', 'admin_refresh')],
+        [Markup.button.callback('🎁 So‘nggi Bepul So‘rovlar', 'admin_requests')],
+      ])
+    )
+  })
+
+  // Admin refresh action
+  bot.action('admin_refresh', async (ctx) => {
+    if (String(ctx.from.id) !== String(config.adminChatId)) {
+      await ctx.answerCbQuery('Faqat admin uchun!')
+      return
+    }
+    const stats = await freeVipService.getStats()
+    const adminText = `🛡 *TAKLIFNOMA — ADMIN BOSHQARUV PANELI*
+
+📊 *Umumiy statistika (Yangilandi):*
+• 💌 Jami taklifnomalar: *${stats.totalInvitations} ta*
+• 🎁 Jami bepul VIP so‘rovlar: *${stats.totalFreeRequests} ta*
+• ⏳ Kutilayotgan so‘rovlar: *${stats.pendingRequests} ta*
+• ✅ Tasdiqlangan (VIP berilgan): *${stats.approvedRequests} ta*
+• ❌ Rad etilgan so‘rovlar: *${stats.rejectedRequests} ta*
+
+⚙️ *Tarif va to‘lov sozlamalari:*
+• 💳 Karta: \`${config.cardNumber}\` (${config.cardHolder})
+• 💰 Narx: *${config.premiumPrice.toLocaleString('uz-UZ')} so‘m*
+• ⏰ Oxirgi tekshiruv: ${new Date().toLocaleTimeString('uz-UZ')}`
+
+    try {
+      await ctx.editMessageText(adminText, {
+        parse_mode: 'Markdown',
+        ...Markup.inlineKeyboard([
+          [Markup.button.callback('🔄 Statistikani Yangilash', 'admin_refresh')],
+          [Markup.button.callback('🎁 So‘nggi Bepul So‘rovlar', 'admin_requests')],
+        ]),
+      })
+      await ctx.answerCbQuery('Statistika yangilandi!')
+    } catch {
+      await ctx.answerCbQuery()
+    }
+  })
+
+  // Admin list recent requests
+  bot.action('admin_requests', async (ctx) => {
+    if (String(ctx.from.id) !== String(config.adminChatId)) {
+      await ctx.answerCbQuery('Faqat admin uchun!')
+      return
+    }
+    const all = freeVipService.getAllRequests().slice(0, 5)
+    if (all.length === 0) {
+      await ctx.answerCbQuery('Hali bepul so‘rovlar yo‘q.')
+      return
+    }
+
+    let report = `📋 *SO‘NGGI 5 TA BEPUL VIP SO‘ROV:* \n\n`
+    all.forEach((r, idx) => {
+      const statusIcon = r.status === 'APPROVED' ? '✅ Berildi' : r.status === 'REJECTED' ? '❌ Rad' : '⏳ Kutilmoqda'
+      report += `${idx + 1}. *${r.name}* (${r.contact})\n`
+      report += `Holat: ${statusIcon} | Manba: ${r.source}\n`
+      report += `Vaqt: ${new Date(r.createdAt).toLocaleString('uz-UZ')}\n\n`
+    })
+
+    await ctx.replyWithMarkdown(
+      report,
+      Markup.inlineKeyboard([
+        [Markup.button.callback('⬅️ Admin panelga qaytish', 'admin_refresh')],
+      ])
+    )
+    await ctx.answerCbQuery()
+  })
+
+  // Free VIP request from bot menu
+  bot.hears('🎁 Bepul VIP So‘rash', async (ctx) => {
+    const text = `🎁 *PREMIUM VIP TARIFINI BEPUL SO‘RASH*
+
+Siz adminga bepul VIP ochib berish haqida bir martalik so‘rov yuborishingiz mumkin.
+Admin tasdiqlasa, sizga xabar keladi va barcha 21 ta hashamatli shablonlar (Palace Romance, Royal Gold va b.) bepul ochiladi!
+
+Adminga so‘rov yuborilsinmi?`
+
+    await ctx.replyWithMarkdown(
+      text,
+      Markup.inlineKeyboard([
+        [Markup.button.callback('🚀 Ha, adminga so‘rov yuborish', 'request_free_vip_bot')],
+      ])
+    )
+  })
+
+  bot.action('request_free_vip_bot', async (ctx) => {
+    await ctx.answerCbQuery()
+    const name = ctx.from.first_name || 'Foydalanuvchi'
+    const username = ctx.from.username ? `@${ctx.from.username}` : ''
+    const contact = username || `Telegram ID: ${ctx.from.id}`
+
+    const vipReq = freeVipService.createRequest({
+      name,
+      contact,
+      telegramId: ctx.from.id,
+      source: 'telegram_bot',
+    })
+
+    await notifyAdminFreeVipRequest(vipReq)
+
+    await ctx.editMessageText(
+      `✅ *So‘rovingiz adminga yuborildi!*
+
+Admin so‘rovingizni ko‘rib chiqmoqda. Admin *"Ha"* deb tasdiqlashi bilanoq sizga ushbu botda xabar beramiz!`,
+      { parse_mode: 'Markdown' }
+    )
+  })
+
+  // Handle Admin Decision: YES (Ha - Tekinga berish)
+  bot.action(/freevip_yes_(.+)/, async (ctx) => {
+    if (String(ctx.from.id) !== String(config.adminChatId)) {
+      await ctx.answerCbQuery('Faqat admin uchun!')
+      return
+    }
+
+    const reqId = ctx.match[1]
+    const req = freeVipService.updateStatus(reqId, 'APPROVED')
+    if (!req) {
+      await ctx.answerCbQuery('So‘rov topilmadi yoki muddati o‘tgan!')
+      return
+    }
+
+    const currentText = ctx.callbackQuery.message && 'text' in ctx.callbackQuery.message ? ctx.callbackQuery.message.text : ''
+    await ctx.editMessageText(
+      `${currentText}\n\n━━━━━━━━━━━━━━━━━━━━\n✅ *TASDIQLANDI: Foydalanuvchiga bepul Premium VIP berildi!* 🎉\n(Admin tasdiqlagan vaqt: ${new Date().toLocaleTimeString('uz-UZ')})`,
+      { parse_mode: 'Markdown' }
+    )
+
+    // Notify User if they sent via Telegram
+    if (req.telegramId) {
+      try {
+        const userMsg = `🎉 *TABRIKLAYMIZ!*
+
+Admin sizning so‘rovingizni ko‘rib chiqdi va sizga *Premium VIP* tarifini *BEPUL* taqdim etdi! 🌟
+
+Endi siz:
+• Barcha 21 ta hashamatli shablonlar (Palace Romance, Royal Gold, Black Tie);
+• Maxsus fon musiqasi va interaktiv konvertlar;
+• Jonli mehmonlar javoblari (RSVP)
+imkoniyatlaridan mutlaqo bepul foydalanishingiz mumkin!
+
+Quyidagi tugmani bosing va taklifnomangizni yarating:`
+
+        await ctx.telegram.sendMessage(req.telegramId, userMsg, {
+          parse_mode: 'Markdown',
+          ...Markup.inlineKeyboard([
+            [Markup.button.webApp('🚀 Taklifnoma Yaratish', `${config.frontendUrl}/create`)],
+            [Markup.button.webApp('🎨 Shablonlarni Ko‘rish', `${config.frontendUrl}/templates`)],
+          ]),
+        })
+      } catch (err) {
+        console.warn('Could not notify user of free VIP approval:', err)
+      }
+    }
+
+    await ctx.answerCbQuery('✅ Foydalanuvchiga bepul VIP berildi!')
+  })
+
+  // Handle Admin Decision: NO (Yo'q - Rad etish)
+  bot.action(/freevip_no_(.+)/, async (ctx) => {
+    if (String(ctx.from.id) !== String(config.adminChatId)) {
+      await ctx.answerCbQuery('Faqat admin uchun!')
+      return
+    }
+
+    const reqId = ctx.match[1]
+    const req = freeVipService.updateStatus(reqId, 'REJECTED')
+    if (!req) {
+      await ctx.answerCbQuery('So‘rov topilmadi!')
+      return
+    }
+
+    const currentText = ctx.callbackQuery.message && 'text' in ctx.callbackQuery.message ? ctx.callbackQuery.message.text : ''
+    await ctx.editMessageText(
+      `${currentText}\n\n━━━━━━━━━━━━━━━━━━━━\n❌ *RAD ETILDI: Bepul VIP berilmadi.*\n(Vaqt: ${new Date().toLocaleTimeString('uz-UZ')})`,
+      { parse_mode: 'Markdown' }
+    )
+
+    // Notify User
+    if (req.telegramId) {
+      try {
+        const userMsg = `Kechirasiz, admin bepul VIP so‘rovingizni rad etdi.
+
+Siz bor-yo‘g‘i *1,000 so‘m* to‘lov evaziga barcha hashamatli shablonlar va imkoniyatlarni ochishingiz mumkin.
+
+💳 *To‘lov kartasi:* \`${config.cardNumber}\` (${config.cardHolder})
+Summa: *1,000 so‘m*
+
+To‘lov chekini yuborsangiz, admin darhol faollashtirib beradi!`
+
+        await ctx.telegram.sendMessage(req.telegramId, userMsg, {
+          parse_mode: 'Markdown',
+          ...Markup.inlineKeyboard([
+            [Markup.button.webApp('💳 Tariflar va To‘lov', `${config.frontendUrl}/pricing`)],
+          ]),
+        })
+      } catch (err) {
+        console.warn('Could not notify user of free VIP rejection:', err)
+      }
+    }
+
+    await ctx.answerCbQuery('❌ So‘rov rad etildi!')
   })
 
   // Start creation wizard
@@ -113,7 +384,7 @@ Quyidagi tugmani bosing va Mini Appni oching:`
 Barcha 21 ta shablonni saytimizda ko‘rishingiz mumkin:`
 
     await ctx.replyWithMarkdown(text, Markup.inlineKeyboard([
-      [Markup.button.url('🌐 Barcha shablonlarni ko‘rish', `${config.frontendUrl}/templates`)],
+      [Markup.button.webApp('🌐 Barcha shablonlarni ko‘rish', `${config.frontendUrl}/templates`)],
       [Markup.button.callback('✨ Taklifnoma yaratish', 'action_create')],
     ]))
   })
@@ -150,11 +421,16 @@ Summa: *${config.premiumPrice.toLocaleString('uz-UZ')} so‘m*
 📸 *To‘lovni amalga oshirgach, chek skrinshotini (rasmini) shu botga yuboring.*
 Admin tekshirib, darhol sizga Premium imkoniyatlarni faollashtirib beradi!`
 
-    await ctx.replyWithMarkdown(text)
+    await ctx.replyWithMarkdown(
+      text,
+      Markup.inlineKeyboard([
+        [Markup.button.callback('🎁 Admindan bepul so‘rash', 'request_free_vip_bot')],
+      ])
+    )
   })
 
   // Admin contact
-  bot.hears('📞 Admin bilan bog‘lanish', async (ctx) => {
+  bot.hears(['📞 Aloqa', '📞 Admin bilan bog‘lanish'], async (ctx) => {
     await ctx.reply(
       `Savollaringiz yoki takliflaringiz bo‘lsa, adminga murojaat qiling:\n📞 Telefon: +998 93 718 88 85\nTelegram: tg://user?id=${config.adminChatId}\nKarta egasi: ${config.cardHolder}`
     )
@@ -166,15 +442,16 @@ Admin tekshirib, darhol sizga Premium imkoniyatlarni faollashtirib beradi!`
     const state = userSessions.get(ctx.from.id)
 
     // Ignore menu commands
-    if (text.startsWith('/') || ['💌 Yangi Taklifnoma Yaratish', '👑 Premium Obuna (1,000 so‘m)', '🌟 Shablonlarni Ko‘rish', '📞 Admin bilan bog‘lanish'].includes(text)) {
+    if (text.startsWith('/') || ['💌 Yangi Taklifnoma Yaratish', '👑 Premium Obuna (1,000 so‘m)', '🌟 Shablonlarni Ko‘rish', '📞 Aloqa', '📞 Admin bilan bog‘lanish', '🎁 Bepul VIP So‘rash'].includes(text)) {
       return
     }
 
     if (!state) {
       await ctx.reply('Iltimos, quyidagi menyudan buyruqni tanlang:', Markup.keyboard([
-        ['💌 Yangi Taklifnoma Yaratish'],
-        ['👑 Premium Obuna (1,000 so‘m)', '🌟 Shablonlarni Ko‘rish'],
-        ['📞 Admin bilan bog‘lanish'],
+        [Markup.button.webApp('🚀 Mini Appni Ochish', config.frontendUrl)],
+        [Markup.button.webApp('🎨 Barcha Shablonlar', `${config.frontendUrl}/templates`), Markup.button.webApp('✍️ Taklifnoma Yaratish', `${config.frontendUrl}/create`)],
+        ['👑 Premium Obuna (1,000 so‘m)', '🎁 Bepul VIP So‘rash'],
+        ['📞 Aloqa'],
       ]).resize())
       return
     }
@@ -343,7 +620,9 @@ Summa: *1,000 so‘m*
 
 Iltimos, 1,000 so‘m to‘lab, *chek rasmini* shu botga yuboring!`
 
-    await ctx.replyWithMarkdown(text)
+    await ctx.replyWithMarkdown(text, Markup.inlineKeyboard([
+      [Markup.button.callback('🎁 Admindan bepul so‘rash', 'request_free_vip_bot')],
+    ]))
   })
 
   // Handle Photo (Payment Receipt from User)

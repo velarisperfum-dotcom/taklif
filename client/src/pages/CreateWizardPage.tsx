@@ -7,6 +7,7 @@ import { TemplateRenderer } from '../templates'
 import { PreviewModal } from '../components/PreviewModal'
 import { ShareModal } from '../components/ShareModal'
 import { PrintInvitationModal } from '../components/PrintInvitationModal'
+import { RequestFreeVipModal } from '../components/RequestFreeVipModal'
 import { templateService } from '../services/template.service'
 import confetti from 'canvas-confetti'
 import {
@@ -28,6 +29,7 @@ import {
   Plus,
   Trash2,
   Printer,
+  Gift,
 } from 'lucide-react'
 
 const STEP_TITLES = [
@@ -103,6 +105,7 @@ export const CreateWizardPage: React.FC = () => {
   const [shareOpen, setShareOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [printModalOpen, setPrintModalOpen] = useState(false)
+  const [freeVipOpen, setFreeVipOpen] = useState(false)
 
   // Load templates and edit data if editId
   useEffect(() => {
@@ -331,13 +334,25 @@ export const CreateWizardPage: React.FC = () => {
                 )}
               </div>
 
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Shablonni qidirish..."
-                className="w-full md:w-72 px-4 py-2 rounded-xl border border-stone-200 text-xs outline-none bg-stone-50"
-              />
+              <div className="flex items-center gap-2.5 w-full md:w-auto">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Shablonni qidirish..."
+                  className="w-full md:w-64 px-4 py-2 rounded-xl border border-stone-200 text-xs outline-none bg-stone-50"
+                />
+                <button
+                  type="button"
+                  onClick={() => setFreeVipOpen(true)}
+                  className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0"
+                  title="Admindan bepul Premium VIP so‘rash"
+                >
+                  <Gift className="w-3.5 h-3.5 text-amber-700" />
+                  <span className="hidden sm:inline">Bepul VIP so‘rash</span>
+                  <span className="sm:hidden">VIP</span>
+                </button>
+              </div>
             </div>
 
             {loadingTemplates ? (
@@ -1017,6 +1032,13 @@ export const CreateWizardPage: React.FC = () => {
           coverTitle: formData.coverTitle,
           publicSlug: savedSlug || undefined,
         }}
+      />
+
+      {/* Free VIP Request Modal */}
+      <RequestFreeVipModal
+        isOpen={freeVipOpen}
+        onClose={() => setFreeVipOpen(false)}
+        currentSlug={savedSlug || undefined}
       />
     </div>
   )

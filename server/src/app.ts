@@ -7,6 +7,7 @@ import { authRouter } from './modules/auth/auth.routes.js'
 import { templateRouter } from './modules/templates/template.routes.js'
 import { invitationRouter } from './modules/invitations/invitation.routes.js'
 import { rsvpRouter } from './modules/rsvp/rsvp.routes.js'
+import { vipRouter } from './modules/vip/freeVip.routes.js'
 
 export const app = express()
 
@@ -32,6 +33,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRouter)
 app.use('/api/templates', templateRouter)
 app.use('/api/invitations', invitationRouter)
+app.use('/api/vip', vipRouter)
 app.use('/api', rsvpRouter)
 
 // 404 handler
