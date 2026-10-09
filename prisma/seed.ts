@@ -3,6 +3,15 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 const TEMPLATES = [
+  // Flagship User-Provided Design
+  {
+    id: 'palace-romance',
+    name: 'Palace Romance (Bekzod & Munisa)',
+    category: 'Premium',
+    description: 'Ko‘l manzarali saroy balkoni, zarhal gultoj arkasi, interaktiv konvert va oqlangan kalligrafiya.',
+    previewImage: '/templates/palace-terrace.jpg',
+    priceTier: 'PREMIUM',
+  },
   // A. Luxury Collection
   {
     id: 'royal-gold',

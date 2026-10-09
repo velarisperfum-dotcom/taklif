@@ -22,15 +22,18 @@ import { NightSky } from './NightSky'
 import { CinematicLove } from './CinematicLove'
 import { GlassElegance } from './GlassElegance'
 import { FloralFrame } from './FloralFrame'
+import { PalaceRomance } from './PalaceRomance'
 
 export const TEMPLATE_COMPONENTS: Record<string, React.FC<TemplateProps>> = {
+  'palace-romance': PalaceRomance,
+  'bekzod-munisa': PalaceRomance,
   'royal-gold': RoyalGold,
   'black-tie': BlackTie,
   'pearl-elegance': PearlElegance,
   'burgundy-royale': BurgundyRoyale,
   'uzbek-heritage': UzbekHeritage,
   'suzani-romance': SuzaniRomance,
-  'oriental-palace': OrientalPalace,
+  'oriental-palace': PalaceRomance,
   'silk-road': SilkRoad,
   'minimal-white': MinimalWhite,
   'editorial-magazine': EditorialMagazine,
@@ -47,6 +50,6 @@ export const TEMPLATE_COMPONENTS: Record<string, React.FC<TemplateProps>> = {
 }
 
 export const TemplateRenderer: React.FC<TemplateProps> = (props) => {
-  const Component = TEMPLATE_COMPONENTS[props.invitation.templateId] || RoyalGold
+  const Component = TEMPLATE_COMPONENTS[props.invitation.templateId] || PalaceRomance
   return <Component {...props} />
 }
