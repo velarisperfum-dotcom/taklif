@@ -11,11 +11,12 @@
     "dev": "npm run dev:server & npm run dev:client",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
+    "postinstall": "npx prisma generate --schema=./prisma/schema.prisma",
     "build": "npm --prefix server install && npx prisma generate --schema=./prisma/schema.prisma && npm --prefix server run build",
     "build:server": "npm --prefix server install && npx prisma generate --schema=./prisma/schema.prisma && npm --prefix server run build",
     "build:client": "npm --prefix client install && npm --prefix client run build",
     "build:all": "npm run build:server && npm run build:client",
-    "start": "node server/dist/index.js",
+    "start": "npx prisma generate --schema=./prisma/schema.prisma && npx prisma db push --schema=./prisma/schema.prisma --accept-data-loss && node server/dist/index.js",
     "db:push": "npx prisma db push",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:generate": "npx prisma generate"
