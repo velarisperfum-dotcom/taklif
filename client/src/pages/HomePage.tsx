@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Template } from '../types'
 import { api } from '../services/api'
+import { templateService } from '../services/template.service'
 import { TemplateCard } from '../components/TemplateCard'
 import { PreviewModal } from '../components/PreviewModal'
 import { TemplateRenderer } from '../templates'
@@ -69,7 +70,7 @@ export const HomePage: React.FC = () => {
     async function load() {
       try {
         setLoading(true)
-        const data = await api.getTemplates()
+        const data = await templateService.getTemplates()
         setTemplates(data)
       } catch (err) {
         console.error('Failed to load templates:', err)

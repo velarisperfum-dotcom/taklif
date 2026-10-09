@@ -1,8 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Template } from '../../types'
-import { Eye, Check, Sparkles } from 'lucide-react'
-
+import { Eye, Check, Sparkles, ArrowRight, Heart } from 'lucide-react'
 
 interface TemplateCardProps {
   template: Template
@@ -11,28 +10,140 @@ interface TemplateCardProps {
   isSelected?: boolean
 }
 
-// Visual themes for card preview tiles
-const TILE_STYLES: Record<string, { bg: string; text: string; accent: string; border: string; label: string }> = {
-  'royal-gold': { bg: 'bg-[#faf7f0]', text: 'text-[#1c1813]', accent: 'text-[#c5a059]', border: 'border-[#d4af37]/40', label: 'Ivory & Gold' },
-  'black-tie': { bg: 'bg-[#0d0d11]', text: 'text-white', accent: 'text-[#e5c17d]', border: 'border-[#e5c17d]/40', label: 'Black & Gold' },
-  'pearl-elegance': { bg: 'bg-[#f8f9fa]', text: 'text-stone-900', accent: 'text-stone-500', border: 'border-stone-300', label: 'Pearl White' },
-  'burgundy-royale': { bg: 'bg-[#380912]', text: 'text-[#fbf6ea]', accent: 'text-[#e0c48b]', border: 'border-[#c5a059]/40', label: 'Deep Burgundy' },
-  'uzbek-heritage': { bg: 'bg-[#faf6ee]', text: 'text-[#0e3b43]', accent: 'text-[#0e7c86]', border: 'border-[#0e7c86]/40', label: 'Sharqona Islimiy' },
-  'suzani-romance': { bg: 'bg-[#fff9f2]', text: 'text-[#801b27]', accent: 'text-[#d96b43]', border: 'border-[#a82b3a]/30', label: 'So‘zana Kashtasi' },
-  'oriental-palace': { bg: 'bg-[#0e1d2e]', text: 'text-white', accent: 'text-[#e2b866]', border: 'border-[#e2b866]/40', label: 'Moviy Samarqand' },
-  'silk-road': { bg: 'bg-[#f3ece0]', text: 'text-[#69331e]', accent: 'text-[#964f33]', border: 'border-[#964f33]/30', label: 'Ipak Yo‘li Zari' },
-  'minimal-white': { bg: 'bg-white', text: 'text-stone-900', accent: 'text-stone-400', border: 'border-stone-200', label: 'Minimalistik Oq' },
-  'editorial-magazine': { bg: 'bg-[#f7f5f0]', text: 'text-stone-950', accent: 'text-stone-700', border: 'border-stone-900', label: 'Vogue Editorial' },
-  'modern-beige': { bg: 'bg-[#ede6dc]', text: 'text-[#2e261f]', accent: 'text-[#a89078]', border: 'border-[#d6cbbe]', label: 'Iliq Bej Latte' },
-  'monochrome': { bg: 'bg-black', text: 'text-white', accent: 'text-stone-400', border: 'border-white', label: 'Qora & Oq' },
-  'rose-garden': { bg: 'bg-[#fff4f6]', text: 'text-rose-950', accent: 'text-rose-500', border: 'border-rose-200', label: 'Pushti Atirgul' },
-  'botanical-love': { bg: 'bg-[#f0f4ef]', text: 'text-[#1e3020]', accent: 'text-[#4a6b4e]', border: 'border-[#4a6b4e]/30', label: 'Evkalipt & Zaytun' },
-  'pastel-dream': { bg: 'bg-[#f7f2fc]', text: 'text-[#341d4a]', accent: 'text-purple-500', border: 'border-purple-200', label: 'Mayin Pastel' },
-  'watercolor-romance': { bg: 'bg-[#f9f7f4]', text: 'text-[#2a211d]', accent: 'text-rose-400', border: 'border-stone-200', label: 'Akvarel Gultoj' },
-  'night-sky': { bg: 'bg-[#070b19]', text: 'text-white', accent: 'text-blue-400', border: 'border-blue-900/60', label: 'Tungi Moviy Falak' },
-  'cinematic-love': { bg: 'bg-[#0c1017]', text: 'text-white', accent: 'text-amber-400', border: 'border-stone-800', label: 'Kino Afishasi' },
-  'glass-elegance': { bg: 'bg-[#181a26]', text: 'text-white', accent: 'text-cyan-300', border: 'border-white/20', label: 'Shaffof Oyna' },
-  'floral-frame': { bg: 'bg-[#faf6ee]', text: 'text-[#1f160f]', accent: 'text-[#c29851]', border: 'border-[#c29851]/40', label: 'Zarhal Gulchambar' },
+// Visual themes & real luxury images for cards
+const TEMPLATE_PREVIEWS: Record<string, { image: string; couple: string; date: string; tag: string }> = {
+  'palace-romance': {
+    image: '/templates/palace-terrace.jpg',
+    couple: 'Bekzod & Munisa',
+    date: '28.06.2026',
+    tag: 'Saroy & Ko‘l',
+  },
+  'bekzod-munisa': {
+    image: '/templates/palace-terrace.jpg',
+    couple: 'Bekzod & Munisa',
+    date: '28.06.2026',
+    tag: 'Saroy & Ko‘l',
+  },
+  'royal-gold': {
+    image: '/templates/royal-gold.jpg',
+    couple: 'Javohir & Nilufar',
+    date: '15.09.2026',
+    tag: 'Zarhal Saroy',
+  },
+  'uzbek-heritage': {
+    image: '/templates/uzbek-heritage.jpg',
+    couple: 'Sardor & Kamola',
+    date: '20.08.2026',
+    tag: 'Registon & So‘zana',
+  },
+  'oriental-palace': {
+    image: '/templates/uzbek-heritage.jpg',
+    couple: 'Bobur & Rayhona',
+    date: '05.09.2026',
+    tag: 'Sharqona Qasr',
+  },
+  'suzani-romance': {
+    image: '/templates/uzbek-heritage.jpg',
+    couple: 'Otabek & Kumush',
+    date: '14.08.2026',
+    tag: 'Ipak So‘zana',
+  },
+  'silk-road': {
+    image: '/templates/uzbek-heritage.jpg',
+    couple: 'Sherzod & Dildora',
+    date: '22.09.2026',
+    tag: 'Buyuk Ipak Yo‘li',
+  },
+  'rose-garden': {
+    image: '/templates/rose-garden.jpg',
+    couple: 'Farrux & Shahzoda',
+    date: '10.07.2026',
+    tag: 'Pushti Bog‘',
+  },
+  'botanical-love': {
+    image: '/templates/rose-garden.jpg',
+    couple: 'Jasur & Malika',
+    date: '19.06.2026',
+    tag: 'Evkalipt & Yashillik',
+  },
+  'floral-frame': {
+    image: '/templates/rose-garden.jpg',
+    couple: 'Alisher & Mohira',
+    date: '11.07.2026',
+    tag: 'Gulli Rom',
+  },
+  'pastel-dream': {
+    image: '/templates/rose-garden.jpg',
+    couple: 'Akmal & Laylo',
+    date: '25.06.2026',
+    tag: 'Mayin Orzu',
+  },
+  'watercolor-romance': {
+    image: '/templates/rose-garden.jpg',
+    couple: 'Shoxrux & Ziyoda',
+    date: '09.08.2026',
+    tag: 'Akvarel San’ati',
+  },
+  'black-tie': {
+    image: '/templates/black-tie.jpg',
+    couple: 'Temur & Sevara',
+    date: '24.10.2026',
+    tag: 'Nafis Qora & Oltin',
+  },
+  'cinematic-love': {
+    image: '/templates/black-tie.jpg',
+    couple: 'Murod & Yulduz',
+    date: '08.10.2026',
+    tag: 'Kino Afishasi',
+  },
+  'night-sky': {
+    image: '/templates/black-tie.jpg',
+    couple: 'Rustam & Feruza',
+    date: '12.09.2026',
+    tag: 'Yulduzli Tun',
+  },
+  'monochrome': {
+    image: '/templates/black-tie.jpg',
+    couple: 'Elyor & Gulnoza',
+    date: '17.10.2026',
+    tag: 'Qora & Oq',
+  },
+  'burgundy-royale': {
+    image: '/templates/royal-gold.jpg',
+    couple: 'Ulug‘bek & Diyora',
+    date: '18.11.2026',
+    tag: 'Bordo & Oltin',
+  },
+  'pearl-elegance': {
+    image: '/templates/palace-terrace.jpg',
+    couple: 'Davron & Zarina',
+    date: '02.08.2026',
+    tag: 'Marvarid Oq',
+  },
+  'editorial-magazine': {
+    image: '/templates/royal-gold.jpg',
+    couple: 'Sanjar & Sabrina',
+    date: '30.08.2026',
+    tag: 'Vogue Editorial',
+  },
+  'modern-beige': {
+    image: '/templates/palace-terrace.jpg',
+    couple: 'Nodir & Aziza',
+    date: '16.09.2026',
+    tag: 'Iliq Bej Latte',
+  },
+  'minimal-white': {
+    image: '/templates/rose-garden.jpg',
+    couple: 'Anvar & Nozima',
+    date: '04.07.2026',
+    tag: 'Minimalistik Oq',
+  },
+  'glass-elegance': {
+    image: '/templates/palace-terrace.jpg',
+    couple: 'Doniyor & Lola',
+    date: '21.07.2026',
+    tag: 'Shaffof Shisha',
+  },
 }
 
 export const TemplateCard: React.FC<TemplateCardProps> = ({
@@ -41,94 +152,109 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
   onSelect,
   isSelected = false,
 }) => {
-  const style = TILE_STYLES[template.id] || {
-    bg: 'bg-stone-50',
-    text: 'text-stone-900',
-    accent: 'text-amber-500',
-    border: 'border-stone-200',
-    label: 'Klassik',
+  const previewData = TEMPLATE_PREVIEWS[template.id] || {
+    image: '/templates/palace-terrace.jpg',
+    couple: 'Bekzod & Munisa',
+    date: '28.06.2026',
+    tag: template.category,
   }
+
+  const isVip = template.priceTier === 'PREMIUM' || template.id === 'palace-romance' || template.id === 'royal-gold' || template.id === 'uzbek-heritage'
 
   return (
     <div
-      className={`group rounded-3xl overflow-hidden border transition-all duration-300 flex flex-col bg-white shadow-sm hover:shadow-xl hover:-translate-y-1 ${
-        isSelected ? 'border-amber-500 ring-2 ring-amber-500/20' : 'border-stone-200/90'
+      className={`group rounded-3xl overflow-hidden border transition-all duration-300 flex flex-col bg-white shadow-sm hover:shadow-2xl hover:-translate-y-1.5 ${
+        isSelected ? 'border-amber-500 ring-2 ring-amber-500/30' : 'border-stone-200/90'
       }`}
     >
-      {/* Visual Preview Box */}
+      {/* Visual Image Preview Box */}
       <div
         onClick={() => onPreview(template)}
-        className={`relative h-64 sm:h-72 ${style.bg} ${style.border} border-b p-6 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-transform`}
+        className="relative h-72 sm:h-80 w-full overflow-hidden cursor-pointer select-none bg-stone-900"
       >
-        {/* Subtle decorative inner border */}
-        <div className="absolute inset-4 border border-current/10 rounded-2xl pointer-events-none" />
+        {/* Background Image with smooth zoom effect */}
+        <img
+          src={previewData.image}
+          alt={template.name}
+          className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out"
+          loading="lazy"
+        />
 
-        {/* Badges */}
-        <div className="absolute top-4 left-4 z-10 flex gap-2">
-          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-stone-900/80 text-white backdrop-blur-md">
+        {/* Ambient Overlay for crystal clear typography */}
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/30 to-stone-950/40 group-hover:via-stone-950/20 transition-colors" />
+
+        {/* Top Badges */}
+        <div className="absolute top-3.5 left-3.5 right-3.5 z-10 flex items-center justify-between">
+          <span className="px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-black/60 text-white backdrop-blur-md border border-white/20 shadow-sm">
             {template.category}
           </span>
-          {template.priceTier === 'PREMIUM' && (
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-amber-500 text-stone-950 flex items-center gap-1 shadow-sm">
-              <Sparkles className="w-3 h-3" />
-              VIP
+          {isVip && (
+            <span className="px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-gradient-to-r from-amber-400 to-amber-500 text-stone-950 flex items-center gap-1 shadow-md font-sans">
+              <Sparkles className="w-3.5 h-3.5" />
+              TOP VIP
             </span>
           )}
         </div>
 
-        {/* Center Mockup Names */}
-        <div className="text-center space-y-1 my-auto">
-          <p className="text-[10px] font-mono uppercase tracking-[0.3em] opacity-60">
-            {style.label}
+        {/* Center/Bottom Calligraphy Mockup Text on the card */}
+        <div className="absolute inset-x-4 bottom-4 z-10 text-center space-y-1 text-white">
+          <p className="text-[10px] uppercase font-mono tracking-[0.25em] text-amber-300/90 drop-shadow">
+            {previewData.tag}
           </p>
-          <h4 className={`text-2xl sm:text-3xl font-bold font-serif-cormorant ${style.text} tracking-tight`}>
-            Aziz & Madina
+          <h4 className="font-['Alex_Brush',_cursive] text-3xl sm:text-4xl text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] leading-tight">
+            {previewData.couple}
           </h4>
-          <p className={`text-xs ${style.accent} font-mono tracking-widest uppercase pt-1`}>
-            12.12.2026
+          <p className="text-[11px] font-mono tracking-widest text-white/80 drop-shadow">
+            ✦ {previewData.date} ✦
           </p>
         </div>
 
-        {/* Hover overlay preview trigger */}
-        <div className="absolute inset-0 bg-stone-950/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+        {/* Desktop Hover Quick Action Bar */}
+        <div className="absolute inset-0 bg-stone-950/50 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 p-4">
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation()
               onPreview(template)
             }}
-            className="px-4 py-2 rounded-full bg-white text-stone-900 text-xs font-semibold flex items-center gap-1.5 shadow-lg hover:bg-stone-100 cursor-pointer"
+            className="px-4 py-2.5 rounded-full bg-white/95 text-stone-900 text-xs font-semibold flex items-center gap-1.5 shadow-xl hover:bg-white transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
           >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Katta ko‘rish</span>
+            <Eye className="w-4 h-4 text-stone-700" />
+            <span>Jonli ko‘rish</span>
           </button>
         </div>
       </div>
 
-      {/* Info Footer */}
-      <div className="p-5 flex-1 flex flex-col justify-between">
+      {/* Card Info & Mobile Friendly Action Buttons */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3.5 bg-white">
         <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <h3 className="font-serif-cormorant text-xl font-bold text-stone-900">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="font-serif-cormorant text-xl font-bold text-stone-900 group-hover:text-amber-800 transition-colors">
               {template.name}
             </h3>
-            <span className="text-xs font-semibold text-stone-500 font-mono">
-              {template.priceTier === 'PREMIUM' ? 'Premium' : 'Bepul'}
-            </span>
+            {isVip ? (
+              <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded-md">
+                Premium
+              </span>
+            ) : (
+              <span className="text-[11px] font-medium text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md">
+                Bepul
+              </span>
+            )}
           </div>
-          <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-stone-500 line-clamp-2 mt-1 leading-relaxed">
             {template.description}
           </p>
         </div>
 
-        {/* Actions */}
-        <div className="pt-4 mt-3 border-t border-stone-100 flex items-center gap-2">
+        {/* Mobile & Desktop Action Buttons */}
+        <div className="grid grid-cols-2 gap-2 pt-1 border-t border-stone-100">
           <button
             type="button"
             onClick={() => onPreview(template)}
-            className="flex-1 py-2.5 px-3 rounded-xl border border-stone-200 hover:border-stone-400 text-stone-700 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-semibold transition-all active:scale-95 cursor-pointer"
           >
-            <Eye className="w-3.5 h-3.5" />
+            <Eye className="w-3.5 h-3.5 text-stone-600" />
             <span>Ko‘rish</span>
           </button>
 
@@ -136,27 +262,22 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
             <button
               type="button"
               onClick={() => onSelect(template)}
-              className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all active:scale-95 cursor-pointer ${
                 isSelected
-                  ? 'bg-amber-500 text-stone-950 shadow-sm'
-                  : 'bg-stone-900 hover:bg-stone-800 text-white'
+                  ? 'bg-amber-600 text-white shadow-md'
+                  : 'bg-stone-900 hover:bg-stone-800 text-white shadow-sm'
               }`}
             >
-              {isSelected ? (
-                <>
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Tanlandi</span>
-                </>
-              ) : (
-                <span>Tanlash</span>
-              )}
+              <Check className="w-3.5 h-3.5" />
+              <span>{isSelected ? 'Tanlandi' : 'Tanlash'}</span>
             </button>
           ) : (
             <Link
               to={`/create?template=${template.id}`}
-              className="flex-1 py-2.5 px-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold transition-all flex items-center justify-center gap-1.5"
+              className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold transition-all shadow-sm active:scale-95 group/btn"
             >
-              <span>Tanlash</span>
+              <span>Yaratish</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
             </Link>
           )}
         </div>
