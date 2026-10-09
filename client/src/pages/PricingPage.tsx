@@ -80,17 +80,30 @@ export const PricingPage: React.FC = () => {
                 Qirollik Tantanasi
               </h3>
               <div className="flex items-baseline gap-1 my-4">
-                <span className="text-4xl font-serif-cormorant font-bold text-amber-400">99,000</span>
+                <span className="text-4xl font-serif-cormorant font-bold text-amber-400">1,000</span>
                 <span className="text-stone-400 text-sm">so‘m / bir martalik</span>
               </div>
               <p className="text-xs text-stone-400 mb-6">
-                Barcha 20 ta hashamatli shablon, musiqa, jonli RSVP va maxsus effektlar.
+                Barcha 21 ta hashamatli shablon, musiqa, jonli RSVP va maxsus effektlar.
               </p>
+
+              {/* Payment Card Box */}
+              <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs space-y-2">
+                <div className="text-amber-300 font-semibold flex items-center gap-1.5">
+                  <span>💳 To‘lov kartasi (Uzcard / Humo):</span>
+                </div>
+                <div className="font-mono text-base tracking-wider text-white font-bold bg-stone-900/80 px-3 py-1.5 rounded-xl border border-stone-800 select-all">
+                  5614 6814 2987 8998
+                </div>
+                <div className="text-[11px] text-stone-400">
+                  Qabul qiluvchi: <span className="text-amber-200 font-medium">A. Z</span>
+                </div>
+              </div>
 
               <ul className="space-y-3 text-xs sm:text-sm text-stone-300">
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Barcha 20 ta premium va milliy shablonlar</span>
+                  <span>Barcha 21 ta premium va milliy shablonlar</span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
@@ -102,7 +115,7 @@ export const PricingPage: React.FC = () => {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Maxsus ranglar va shriftlar</span>
+                  <span>Telegram bot orqali avtomatik tasdiqlash</span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
@@ -116,7 +129,7 @@ export const PricingPage: React.FC = () => {
                 to="/create"
                 className="w-full py-3.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-xs flex items-center justify-center transition-all shadow-lg shadow-amber-500/20"
               >
-                Premium taklifnoma yaratish
+                Premium taklifnoma yaratish (1,000 so‘m)
               </Link>
             </div>
           </div>
