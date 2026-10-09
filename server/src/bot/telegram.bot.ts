@@ -37,27 +37,52 @@ export function setupTelegramBot() {
     return
   }
 
+  // Set persistent bottom-left chat menu button to open Mini App
+  bot.telegram
+    .setChatMenuButton({
+      menuButton: {
+        type: 'web_app',
+        text: 'Taklifnoma Mini App',
+        web_app: { url: config.frontendUrl },
+      },
+    })
+    .catch((err) => console.warn('setChatMenuButton warning:', err))
+
   // /start command
   bot.command('start', async (ctx) => {
     userSessions.delete(ctx.from.id)
 
     const welcomeText = `✨ *Assalomu alaykum, ${ctx.from.first_name || 'aziz mehmon'}!*
 
-💍 *Taklifnoma* — O‘zbekistondagi eng chiroyli va zamonaviy raqamli to‘y taklifnomalari platformasiga xush kelibsiz!
+💍 *Taklifnoma Mini App* — O‘zbekistondagi eng chiroyli va zamonaviy raqamli to‘y taklifnomalari ilovasiga xush kelibsiz!
 
-Bot orqali siz:
-• Bir necha daqiqada o‘zingizning hashamatli raqamli to‘y taklifnomangizni yaratishingiz;
-• Jonli sanagich (countdown), to‘yxona lokatsiyasi va musiqaga ega bo‘lishingiz;
-• Mehmonlaringizga Telegram orqali bitta havola yuborishingiz mumkin!
+🚀 *Endi siz Telegramdan chiqmasdan turib:*
+• 21 xil hashamatli to‘y shablonlarini to‘liq ekranda tomosha qilishingiz;
+• O‘zingizning raqamli to‘y taklifnomangizni 2 daqiqada yaratishingiz;
+• Jonli sanagich, musiqa va xarita bilan mehmonlaringizga ulashishingiz mumkin!
 
-Quyidagi menyudan kerakli bo‘limni tanlang:`
+Quyidagi tugmani bosing va Mini Appni oching:`
 
+    // Inline Mini App Button
     await ctx.replyWithMarkdown(
       welcomeText,
+      Markup.inlineKeyboard([
+        [Markup.button.webApp('🚀 Taklifnoma Mini Appni Ochish', config.frontendUrl)],
+        [
+          Markup.button.webApp('🎨 Shablonlar', `${config.frontendUrl}/templates`),
+          Markup.button.webApp('✍️ Yaratish', `${config.frontendUrl}/create`),
+        ],
+        [Markup.button.webApp('👑 Premium VIP (1,000 so‘m)', `${config.frontendUrl}/pricing`)],
+      ])
+    )
+
+    // Keyboard Menu
+    await ctx.reply(
+      'Yoki pastdagi menyu tugmalaridan foydalaning:',
       Markup.keyboard([
-        ['💌 Yangi Taklifnoma Yaratish'],
-        ['👑 Premium Obuna (1,000 so‘m)', '🌟 Shablonlarni Ko‘rish'],
-        ['📞 Admin bilan bog‘lanish'],
+        [Markup.button.webApp('🚀 Mini Appni Ochish', config.frontendUrl)],
+        [Markup.button.webApp('🎨 Barcha Shablonlar', `${config.frontendUrl}/templates`), Markup.button.webApp('✍️ Taklifnoma Yaratish', `${config.frontendUrl}/create`)],
+        ['👑 Premium Obuna (1,000 so‘m)', '📞 Aloqa'],
       ]).resize()
     )
   })
@@ -285,7 +310,7 @@ Ushbu havolani Telegram va WhatsApp orqali barcha yaqinlaringizga yuborishingiz 
         await ctx.replyWithMarkdown(
           successText,
           Markup.inlineKeyboard([
-            [Markup.button.url('👀 Taklifnomani Ko‘rish', publicUrl)],
+            [Markup.button.webApp('📱 Mini Appda Ko‘rish', publicUrl)],
             [Markup.button.url('📲 Telegramda Ulashish', `https://t.me/share/url?url=${encodeURIComponent(publicUrl)}&text=${encodeURIComponent(`${newInvitation.groomName} & ${newInvitation.brideName} to‘yiga taklifnoma!`)}`)],
             [Markup.button.callback('👑 Premium VIP ga oshirish (1,000 so‘m)', `upgrade_${slug}`)],
           ])
