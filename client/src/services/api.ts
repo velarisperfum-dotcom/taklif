@@ -33,15 +33,44 @@ function generateLocalSlug(groomName: string, brideName: string): string {
   return `${cleanG}-${cleanB}-${rand}`
 }
 
+const PRODUCTION_API = 'https://taklif-production-90e7.up.railway.app/api'
+
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE}${endpoint}`
-  const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  })
+  let response: Response | undefined
+
+  try {
+    response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    })
+    // If Vite proxy returns 502/504 because localhost:5001 isn't running, fallback to Railway
+    if ((response.status === 502 || response.status === 504) && API_BASE !== PRODUCTION_API) {
+      response = await fetch(`${PRODUCTION_API}${endpoint}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+        ...options,
+      })
+    }
+  } catch (netErr) {
+    // If local fetch fails completely, fallback to production API
+    if (API_BASE !== PRODUCTION_API) {
+      response = await fetch(`${PRODUCTION_API}${endpoint}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+        ...options,
+      })
+    } else {
+      throw netErr
+    }
+  }
 
   if (!response.ok) {
     let errorMsg = 'Xatolik yuz berdi'
