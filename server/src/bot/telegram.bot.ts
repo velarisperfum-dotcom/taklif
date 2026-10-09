@@ -131,7 +131,7 @@ Admin tekshirib, darhol sizga Premium imkoniyatlarni faollashtirib beradi!`
   // Admin contact
   bot.hears('📞 Admin bilan bog‘lanish', async (ctx) => {
     await ctx.reply(
-      `Savollaringiz yoki takliflaringiz bo‘lsa, adminga murojaat qiling:\nTelegram: tg://user?id=${config.adminChatId}\nTelefon / Karta egasi: ${config.cardHolder}`
+      `Savollaringiz yoki takliflaringiz bo‘lsa, adminga murojaat qiling:\n📞 Telefon: +998 93 718 88 85\nTelegram: tg://user?id=${config.adminChatId}\nKarta egasi: ${config.cardHolder}`
     )
   })
 
