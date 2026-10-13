@@ -70,8 +70,8 @@ export const CountdownTimer: React.FC<CountdownProps> = ({
   if (timeLeft.isPast) {
     return (
       <div className={`text-center py-4 px-6 rounded-2xl ${className}`}>
-        <p className="text-sm font-medium tracking-widest uppercase opacity-80">
-          {timeLeft.isToday ? "Bugun bizning baxt to‘yimiz! 🎉" : "To‘y tantanasi bo‘lib o‘tdi ✨"}
+        <p className="text-sm font-medium tracking-widest uppercase opacity-80 animate-pulse">
+          {timeLeft.isToday ? 'Bugun bizning baxt to‘yimiz! 🎉' : 'To‘y tantanasi bo‘lib o‘tdi ✨'}
         </p>
       </div>
     )
@@ -80,32 +80,32 @@ export const CountdownTimer: React.FC<CountdownProps> = ({
   // Variant styles
   const styles = {
     gold: {
-      box: 'bg-stone-900/60 border border-amber-500/30 text-amber-200 backdrop-blur-md shadow-lg shadow-amber-950/20',
-      num: 'text-amber-300 font-serif-cormorant',
+      box: 'bg-stone-900/80 border border-amber-500/40 text-amber-200 backdrop-blur-md shadow-xl hover:border-amber-400 group',
+      num: 'text-amber-300 font-serif-cormorant drop-shadow-[0_2px_4px_rgba(251,191,36,0.2)]',
       label: 'text-amber-400/80',
     },
     dark: {
-      box: 'bg-stone-900/80 border border-stone-700/60 text-stone-100 backdrop-blur-md shadow-xl',
+      box: 'bg-stone-900/90 border border-stone-700/80 text-stone-100 backdrop-blur-md shadow-xl hover:border-amber-500/50 group',
       num: 'text-white font-serif-cormorant',
       label: 'text-stone-400',
     },
     light: {
-      box: 'bg-white/80 border border-stone-200 text-stone-800 shadow-sm backdrop-blur-sm',
+      box: 'bg-white/90 border border-amber-200/80 text-stone-800 shadow-md backdrop-blur-md hover:border-amber-400 group',
       num: 'text-stone-900 font-serif-cormorant',
       label: 'text-stone-500',
     },
     rose: {
-      box: 'bg-rose-50/80 border border-rose-200/60 text-rose-900 backdrop-blur-sm shadow-sm',
+      box: 'bg-rose-50/90 border border-rose-300/80 text-rose-900 backdrop-blur-md shadow-md hover:border-rose-400 group',
       num: 'text-rose-800 font-serif-cormorant',
       label: 'text-rose-600/80',
     },
     emerald: {
-      box: 'bg-emerald-950/70 border border-emerald-600/30 text-emerald-200 backdrop-blur-md',
+      box: 'bg-emerald-950/80 border border-emerald-500/40 text-emerald-200 backdrop-blur-md shadow-xl hover:border-emerald-400 group',
       num: 'text-emerald-300 font-serif-cormorant',
       label: 'text-emerald-400/80',
     },
     minimal: {
-      box: 'border-b border-current pb-2',
+      box: 'border border-current/20 backdrop-blur-sm bg-current/5',
       num: 'font-mono text-current',
       label: 'text-current opacity-70',
     },
@@ -119,19 +119,27 @@ export const CountdownTimer: React.FC<CountdownProps> = ({
   ]
 
   return (
-    <div className={`flex items-center justify-center gap-2 sm:gap-4 ${className}`}>
+    <div className={`flex items-center justify-center gap-2 sm:gap-4 ${className} select-none`}>
       {items.map((item, index) => (
-        <div
-          key={index}
-          className={`flex flex-col items-center justify-center w-16 h-18 sm:w-20 sm:h-22 rounded-xl transition-all ${styles.box}`}
-        >
-          <span className={`text-2xl sm:text-3xl font-semibold tracking-tight ${styles.num}`}>
-            {String(item.value).padStart(2, '0')}
-          </span>
-          <span className={`text-[10px] sm:text-xs uppercase tracking-wider font-medium mt-1 ${styles.label}`}>
-            {item.label}
-          </span>
-        </div>
+        <React.Fragment key={index}>
+          <div
+            className={`flex flex-col items-center justify-center w-16 h-18 sm:w-20 sm:h-22 rounded-2xl transition-all duration-300 hover:scale-105 ${styles.box}`}
+          >
+            <span
+              className={`text-2xl sm:text-3xl font-bold tracking-tight transition-transform duration-300 ${styles.num}`}
+            >
+              {String(item.value).padStart(2, '0')}
+            </span>
+            <span
+              className={`text-[10px] sm:text-xs uppercase tracking-wider font-semibold mt-0.5 ${styles.label}`}
+            >
+              {item.label}
+            </span>
+          </div>
+          {index < items.length - 1 && (
+            <span className="text-xl sm:text-2xl font-light opacity-40 animate-pulse">:</span>
+          )}
+        </React.Fragment>
       ))}
     </div>
   )

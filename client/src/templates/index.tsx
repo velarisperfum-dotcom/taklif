@@ -33,7 +33,7 @@ export const TEMPLATE_COMPONENTS: Record<string, React.FC<TemplateProps>> = {
   'burgundy-royale': BurgundyRoyale,
   'uzbek-heritage': UzbekHeritage,
   'suzani-romance': SuzaniRomance,
-  'oriental-palace': PalaceRomance,
+  'oriental-palace': OrientalPalace,
   'silk-road': SilkRoad,
   'minimal-white': MinimalWhite,
   'editorial-magazine': EditorialMagazine,

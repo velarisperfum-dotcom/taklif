@@ -76,6 +76,125 @@
   animation: pulse-gentle 4s ease-in-out infinite;
 }
 
+/* Ken Burns background zoom */
+@keyframes ken-burns {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.08) translate(-1%, -0.5%); }
+  100% { transform: scale(1) translate(0, 0); }
+}
+
+.animate-ken-burns {
+  animation: ken-burns 22s ease-in-out infinite alternate;
+}
+
+/* Heartbeat pulse */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.18); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.18); }
+  70% { transform: scale(1); }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 2.2s ease-in-out infinite;
+}
+
+/* Luxury gold text shimmer */
+@keyframes gold-sheen {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-gold-sheen {
+  background: linear-gradient(90deg, #b8860b 0%, #ffd700 25%, #fff8dc 50%, #ffd700 75%, #b8860b 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gold-sheen 6s linear infinite;
+}
+
+/* Vinyl disk spin */
+@keyframes music-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-music-spin {
+  animation: music-spin 6s linear infinite;
+}
+
+/* Equalizer sound bars */
+@keyframes eq-1 { 0%, 100% { height: 4px; } 50% { height: 16px; } }
+@keyframes eq-2 { 0%, 100% { height: 16px; } 50% { height: 6px; } }
+@keyframes eq-3 { 0%, 100% { height: 8px; } 50% { height: 18px; } }
+@keyframes eq-4 { 0%, 100% { height: 14px; } 50% { height: 5px; } }
+
+.animate-eq-1 { animation: eq-1 0.8s ease-in-out infinite; }
+.animate-eq-2 { animation: eq-2 0.7s ease-in-out infinite 0.1s; }
+.animate-eq-3 { animation: eq-3 0.9s ease-in-out infinite 0.2s; }
+.animate-eq-4 { animation: eq-4 0.6s ease-in-out infinite 0.15s; }
+
+/* Twinkle stars & golden sparkles */
+@keyframes twinkle-glow {
+  0%, 100% { transform: scale(0.6) rotate(0deg); opacity: 0.3; }
+  50% { transform: scale(1.25) rotate(180deg); opacity: 1; filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.9)); }
+}
+
+.animate-twinkle {
+  animation: twinkle-glow 2.8s ease-in-out infinite;
+}
+
+/* Floating musical notes */
+@keyframes note-float {
+  0% { transform: translateY(0) scale(0.6) rotate(0deg); opacity: 0; }
+  30% { opacity: 0.9; }
+  100% { transform: translateY(-35px) scale(1) rotate(-15deg); opacity: 0; }
+}
+
+.animate-note-float {
+  animation: note-float 2.4s ease-out infinite;
+}
+
+/* Floating element hover wave */
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 3.5s ease-in-out infinite;
+}
+
+/* Rising interactive love reaction hearts */
+@keyframes rising-love-heart {
+  0% {
+    transform: translate(0, 0) scale(0.6) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(var(--sway, 20px), -240px) scale(1.3) rotate(var(--rot, 25deg));
+    opacity: 0;
+  }
+}
+
+.animate-rising-heart {
+  animation: rising-love-heart 2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+
+/* Golden border radar glow */
+@keyframes radar-ring {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.animate-radar-ring {
+  animation: radar-ring 2.2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
